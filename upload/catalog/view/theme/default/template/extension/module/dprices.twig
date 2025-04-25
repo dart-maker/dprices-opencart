@@ -1,0 +1,278 @@
+<div class="module-dprices module-dprices-{{ module }}"{% if attr_ID %} id="{{ attr_ID }}"{% endif %}>
+    <div class="module-dprices-wrap">
+        <div class="module-dprices-content">
+            {% if heading_title %}
+                <h2>{{ heading_title }}</h2>
+            {% endif %}
+
+            {% if description %}
+                <div class="description">{{ description }}</div>
+            {% endif %}
+
+            <div class="dprices-content">
+                <div class="d_price-prices">
+                    {% for price in prices %}
+                        <div class="d_price-price">
+                            <div class="d_price-price-wrap">
+                                <div class="d_price-price-front">
+                                    <div class="container-info">
+                                        {% if price['thumb'] %}
+                                            <div class="price-image">
+                                                <img src="{{ price['thumb'] }}" alt="{{ price['title'] }}">
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="price-caption">
+                                            <h4 class="price-name price-name-front">
+                                                <span class="field-value">{{ price['title'] }}</span>
+                                            </h4>
+
+                                            {% if price['description'] %}
+                                                <div class="price-short-info">{{ price['description'] }}</div>
+                                            {% endif %}
+
+                                            {% if view_prices %}
+                                                <div class="price-price">
+                                                    {% if currency_side == 'left' %}<span class="field-currency before">{{ currency }}</span>{% endif %}<span class="field-value">{{ price['price'] }}</span>
+
+                                                    {% if currency_side == 'right' %}
+                                                        <span class="field-currency">{{ currency }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="price-buttons">
+                                            <button type="button" class="order-price">
+                                                <i class="fa fa-shopping-cart"></i>
+                                                <span class="btn-txt">{{ text_order }}</span>
+                                            </button>
+
+                                            <button type="button" class="to-back">
+                                                <span class="btn-more">{{ text_see_more }}</span>
+                                                <i class="fa fa-long-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d_price-price-back">
+                                    <div class="container-info">
+                                        <h4 class="price-name price-name-back">{{ price['title'] }}</h4>
+
+                                        <div class="price-full-info">{{ price['more'] }}</div>
+                                    </div>
+
+                                    <div class="price-buttons">
+                                        <button type="button" class="to-front">
+                                            <i class="fa fa-long-arrow-left"></i>
+                                            <span class="btn-front">{{ text_back }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-dprices-form_order">
+        <div class="module-dprices-form_order-wrap">
+            <h5>{{ text_form_h5 }}</h5>
+
+            <div class="form_order-fields">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="module-dprices-form_order-{{ module }}">
+                    <div class="fields-wrap">
+                        <div class="form_order-field field_name">
+                            <input type="text" name="name" value="" placeholder="{{ entry_name }}">
+                        </div>
+
+                        <div class="form_order-field field_email">
+                            <input type="email" name="email" value="" placeholder="{{ entry_email }} *" required>
+                        </div>
+
+                        <div class="form_order-field field_phone">
+                            <input type="tel" name="phone" value="" placeholder="{{ entry_phone }}">
+                        </div>
+
+                        <div class="form_order-field field_captcha">
+                            {{ captcha }}
+                        </div>
+
+                        <div class="form_order-hidden_fields">
+                            <input type="hidden" name="order" value="">
+                            <input type="hidden" name="price" value="">
+                            <input type="hidden" name="currency" value="">
+                            <input type="hidden" name="ccode" value="{{ captcha_code }}" class="input-not_clear">
+                        </div>
+
+                        <div class="form_order-submit">
+                            <button type="submit" class="form_submit">{{ button_order }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form_order-close"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Fire on document
+        $(document).ready(function() {
+            // Open Info Prices.
+            $('.module-dprices-{{ module }} .to-back').on('click', function(){
+                $(this).closest('.d_price-price').addClass('flipped');
+            });
+            $('.module-dprices-{{ module }} .to-front').on('click', function(){
+                $(this).closest('.d_price-price').removeClass('flipped');
+            });
+
+            // Open Form Order.
+            $('.module-dprices .order-price').on('click', function (e) {
+                e.preventDefault();
+
+                const order = $(this).closest('.d_price-price').find('.price-name-front .field-value').text();
+
+                $(this).closest('.module-dprices').find('form [name="order"]').val(order);
+
+                {% if view_prices %}
+                    const price = $(this).closest('.d_price-price').find('.price-price .field-value').text();
+                    const currency = $(this).closest('.d_price-price').find('.price-price .field-currency').text();
+
+                    $(this).closest('.module-dprices').find('form [name="price"]').val(price);
+                    $(this).closest('.module-dprices').find('form [name="currency"]').val(currency);
+                {% endif %}
+
+                let bodyScrollbarWidth = getScrollbarWidthDPrices();
+
+                $('body').css({
+                    'overflow' : 'hidden',
+                    'padding-right' : bodyScrollbarWidth + 'px'
+                });
+
+                $('.module-dprices .module-dprices-form_order').css('padding-right', bodyScrollbarWidth + 'px').addClass('open');
+            });
+
+            // Close Form Order.
+            $('.module-dprices .form_order-close').on('click', function (e) {
+                e.preventDefault();
+
+                $(this).closest('.module-dprices').find('form input:not(.input-not_clear), form textarea').val('');
+                $(this).closest('.module-dprices').find('.field_error_general').remove();
+                $(this).closest('.module-dprices').find('.field_error').remove();
+                $(this).closest('.module-dprices').find('.success').remove();
+
+                $('body').css({
+                    'overflow' : '',
+                    'padding-right' : ''
+                });
+
+                $('.module-dprices .module-dprices-form_order').css('padding-right', '').removeClass('open');
+            });
+
+            // Submit Form Order.
+            $('#module-dprices-form_order-{{ module }}').on('submit', function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var action = form.attr('action');
+
+                $.ajax({
+                    type: 'post',
+                    url: action,
+                    data: form.serialize(),
+                    dataType: 'json',
+                    beforeSend: function() {
+                        form.find('.field_error_general').remove();
+                        form.find('.field_error').remove();
+                        form.find('.success').remove();
+                        form.addClass('loader');
+                        form.append('<div class="loader-ring"><div></div><div></div><div></div><div></div></div>');
+                    },
+                    complete: function() {
+                        form.find('.loader-ring').remove();
+                        form.removeClass('loader');
+                    },
+                    success: function (json) {
+                        //console.log(json);
+
+                        if (json['error']) {
+                            var errorGeneral = '<div class="field_error_general">';
+
+                            if (json['error']['form']['fields']) {
+                                errorGeneral += json['error']['general'];
+
+                                if (json['error']['form']['fields']['name']) {
+                                    form.find('[name="name"]').after('<div class="field_error">' + json['error']['form']['fields']['name'] + '</div>');
+                                }
+
+                                if (json['error']['form']['fields']['email']) {
+                                    form.find('[name="email"]').after('<div class="field_error">' + json['error']['form']['fields']['email'] + '</div>');
+                                }
+
+                                if (json['error']['form']['fields']['phone']) {
+                                    form.find('[name="phone"]').after('<div class="field_error">' + json['error']['form']['fields']['phone'] + '</div>');
+                                }
+
+                                if (json['error']['form']['fields']['message']) {
+                                    form.find('[name="message"]').after('<div class="field_error">' + json['error']['form']['fields']['message'] + '</div>');
+                                }
+                            }
+
+                            if (json['error']['form']['captcha']) {
+                                if (json['error']['form']['fields']) {
+                                    errorGeneral += '<br>';
+                                }
+
+                                errorGeneral += json['error']['form']['captcha'];
+                            }
+
+                            if (json['error']['form']['ccode']) {
+                                if (json['error']['form']['fields']) {
+                                    errorGeneral += '<br>';
+                                }
+
+                                errorGeneral += json['error']['form']['ccode'];
+                            }
+
+                            errorGeneral += '</div>';
+
+                            form.prepend(errorGeneral);
+                        }
+
+                        if (json['success']) {
+                            form.prepend('<div class="success">' + json['text_success'] + '</div>');
+                        }
+                    }
+                });
+            });
+
+            // Getting Scrollbar width.
+            function getScrollbarWidthDPrices() {
+                // Creating invisible container.
+                const outer = document.createElement('div');
+                outer.style.visibility = 'hidden';
+                outer.style.overflow = 'scroll';
+                outer.style.msOverflowStyle = 'scrollbar';
+                if (document.body == null) return 0;
+                document.body.appendChild(outer);
+
+                // Creating inner element and placing it in the container.
+                const inner = document.createElement('div');
+                outer.appendChild(inner);
+
+                // Calculating difference between container's full width and the child width.
+                const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+
+                // Removing temporary elements from the DOM.
+                outer.parentNode.removeChild(outer);
+
+                // Return width.
+                return scrollbarWidth;
+            }
+        });
+    </script>
+</div>
