@@ -1,0 +1,422 @@
+@charset "UTF-8";
+
+/* Elements */
+
+.module-dprices {
+    width: 100%;
+    color: #666;
+    font-size: 12px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    line-height: 20px;
+    margin: 40px 0;
+}
+.module-dprices * {
+    box-sizing: border-box;
+}
+.module-dprices .d_price-prices {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 35px 30px;
+}
+.module-dprices .d_price-price {
+    background-color: #fff;
+}
+.module-dprices .d_price-price-wrap {
+    position: relative;
+    color: #444;
+    line-height: 16px;
+    margin: 0;
+}
+.module-dprices h4 {
+    color: inherit;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 700;
+    line-height: inherit;
+    margin: 10px 0;
+}
+.module-dprices .description {
+    margin-bottom: 20px;
+}
+.module-dprices .price-buttons {
+    background-color: #eee;
+    border-top: 1px solid #ddd;
+    overflow: hidden;
+}
+.module-dprices .price-buttons button {
+    display: inline-block;
+    color: #888;
+    font-size: inherit;
+    font-family: inherit;
+    line-height: 38px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #eee;
+    border: none;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Front */
+
+.module-dprices .d_price-price-front {
+    position: relative;
+    border: 1px solid #ddd;
+    opacity: 1;
+    z-index: 2;
+    -webkit-transform: perspective(2000px) rotateY(0deg);
+    transform: perspective(2000px) rotateY(0deg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: all .6s ease-in-out;
+    transition: all .6s ease-in-out;
+}
+.module-dprices .d_price-price.flipped .d_price-price-front {
+    opacity: 0;
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+}
+.module-dprices .price-image,
+.module-dprices .price-caption {
+    padding: 0 20px;
+}
+.module-dprices .price-image {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.module-dprices .price-image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 0;
+    margin: 0 auto;
+}
+.module-dprices .price-caption {
+    height: 180px;
+}
+.module-dprices .price-short-info {
+    max-height: 100px;
+    line-height: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.module-dprices .d_price-price-front .price-buttons button {
+    width: 44%;
+    float: left;
+}
+.module-dprices .d_price-price-front .price-buttons button + button {
+    width: 56%;
+    border-left: 1px solid #ddd;
+}
+.module-dprices .d_price-price-front .price-buttons button:hover {
+    color: #444;
+    background-color: #ddd;
+}
+.module-dprices .to-back i {
+    font-size: 1em;
+    margin-left: 3px;
+}
+
+/* Back */
+
+.module-dprices .d_price-price-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid #ddd;
+    opacity: 0;
+    z-index: 3;
+    -webkit-transform: perspective(2000px) rotateY(-180deg);
+    transform: perspective(2000px) rotateY(-180deg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: all .6s ease-in-out;
+    transition: all .6s ease-in-out;
+}
+.module-dprices .d_price-price.flipped .d_price-price-back {
+    opacity: 1;
+    -webkit-transform: rotateY(0deg);
+    transform: rotateY(0deg);
+}
+.module-dprices .d_price-price-back .container-info {
+    max-height: calc(100% - 43px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.module-dprices h4.price-name-back {
+    text-align: center;
+    margin: 20px 0 30px 0;
+}
+.module-dprices .price-full-info {
+    line-height: 20px;
+    padding: 0 20px;
+}
+.module-dprices .d_price-price-back .price-buttons {
+    height: 42px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+.module-dprices .d_price-price-back .price-buttons button {
+    width: 100%;
+}
+.module-dprices .d_price-price-back .price-buttons button:hover {
+    color: #444;
+    background-color: #ddd;
+}
+.module-dprices .to-front i {
+    font-size: 1em;
+    margin-right: 3px;
+}
+
+/* Form */
+
+.module-dprices .module-dprices-form_order {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: fixed;
+    top: 100%;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 11;
+    -webkit-transition: background-color .5s ease-in-out, top 0s ease-in-out .5s;
+    transition: background-color .5s ease-in-out, top 0s ease-in-out .5s;
+}
+.module-dprices .module-dprices-form_order.open {
+    display: block;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-transition: background-color .5s ease-in-out, top 0s ease-in-out;
+    transition: background-color .5s ease-in-out, top 0s ease-in-out;
+}
+.module-dprices .module-dprices-form_order-wrap {
+    width: 460px;
+    position: relative;
+    top: calc(100vw / 9);
+    background-color: #fff;
+    padding: 30px 15px 25px;
+    margin: 0 auto;
+    opacity: 0;
+    -webkit-transition: opacity .3s ease-in-out, top .5s ease-in-out;
+    transition: opacity .3s ease-in-out, top .5s ease-in-out;
+}
+.module-dprices .module-dprices-form_order.open .module-dprices-form_order-wrap {
+    top: calc(100vw / 12);
+    opacity: 1;
+    -webkit-transition: opacity .3s ease-in-out, top .5s ease-in-out;
+    transition: opacity .3s ease-in-out, top .5s ease-in-out;
+}
+.module-dprices .module-dprices-form_order h5 {
+    font-size: 20px;
+    font-family: var(--font-family-two);
+    text-align: center;
+    margin: 0 0 5px 0;
+}
+.module-dprices form {
+    position: relative;
+}
+.module-dprices .fields-wrap {
+    padding: 15px;
+}
+.module-dprices .form_order-field {
+    padding: 6px 0;
+}
+.module-dprices .form_order-fields input {
+    width: 100%;
+    display: block;
+    height: 40px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    background-color: #eee;
+    border: none;
+    padding: 5px 10px;
+}
+.module-dprices .form_order-fields input:focus,
+.module-dprices .form_order-fields input:focus-visible {
+    outline: none;
+}
+.module-dprices .form_order-submit {
+    padding: 10px 0 0;
+}
+.module-dprices .form_submit {
+    width: 100%;
+    height: 40px;
+    display: block;
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    text-transform: none;
+    background-color: #2395c1;
+    border: none;
+    margin: 0;
+    padding: 4px 12px;
+    -webkit-transition: background-color .5s ease-in-out;
+    transition: background-color .5s ease-in-out;
+    cursor: pointer;
+    appearance: none;
+}
+.module-dprices .form_submit:hover {
+    background-color: #1c7293;
+}
+.module-dprices .form_order-close {
+    width: 26px;
+    height: 26px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+.module-dprices .form_order-close:before,
+.module-dprices .form_order-close:after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    height: 26px;
+    width: 2px;
+    background-color: #2395c1;
+    -webkit-transition: all .3s ease-in-out 0s;
+    transition: all .3s ease-in-out 0s;
+}
+.module-dprices .form_order-close:hover:before,
+.module-dprices .form_order-close:hover:after {
+    background-color: #1c7293;
+}
+.module-dprices .form_order-close:before {
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.module-dprices .form_order-close:after {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+/* Placeholder */
+
+.module-dprices ::placeholder {
+	color: #b1b1b1;
+	opacity: 1;
+	-webkit-transition: opacity .3s ease-in-out 0s;
+	transition: opacity .3s ease-in-out 0s;
+}
+
+.module-dprices :focus::placeholder {
+	opacity: 0;
+}
+
+/* Message */
+
+.module-dprices .field_error_general {
+    color: #f43d3d;
+    font-size: 14px;
+    text-align: center;
+    word-wrap: break-word;
+    border-top: 1px solid #f43d3d;
+    border-bottom: 1px solid #f43d3d;
+    padding: 10px;
+    margin: 15px 0 0;
+}
+.module-dprices .success {
+    color: #3aa10f;
+    font-size: 14px;
+    text-align: center;
+    word-wrap: break-word;
+    border-top: 1px solid #3aa10f;
+    border-bottom: 1px solid #3aa10f;
+    padding: 10px;
+    margin: 15px 0 0;
+}
+.module-dprices .field_error {
+    color: #dc3545;
+    font-size: 11px;
+    word-wrap: break-word;
+    line-height: 18px;
+}
+
+/* Loader */
+
+.module-dprices form.loader::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+.module-dprices form .loader-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+/* Loader Ring */
+
+.loader-ring {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+    position: relative;
+}
+.loader-ring div {
+    width: 64px;
+    height: 64px;
+    display: block;
+    position: absolute;
+    border: 8px solid #fff;
+    border-color: #2395c1 transparent transparent transparent;
+    border-radius: 50%;
+    margin: 8px;
+    -webkit-animation: loader-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    animation: loader-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    box-sizing: border-box;
+}
+.loader-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.loader-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.loader-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@-webkit-keyframes loader-ring {
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@keyframes loader-ring {
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+/* @Media */
+
+@media (max-width: 767px) {
+    .module-dprices .module-dprices-form_order-wrap {
+        width: calc(100vw - 30px);
+        height: calc(100vh - 30px);
+        overflow: auto;
+    }
+    .module-dprices .module-dprices-form_order.open .module-dprices-form_order-wrap {
+        top: 15px;
+    }
+}
+@media (max-width: 1170px) and (min-width: 601px) {
+    .module-dprices .d_price-prices {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 600px) {
+    .module-dprices .d_price-prices {
+        grid-template-columns: 1fr;
+    }
+}

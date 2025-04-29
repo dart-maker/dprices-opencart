@@ -1,0 +1,479 @@
+{{ header }}
+{{ column_left }}
+
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="float-end">
+                <button type="submit" form="form-module" data-bs-toggle="tooltip" title="" class="btn btn-primary" data-bs-original-title="{{ button_save }}" aria-label="{{ button_save }}">
+                    <i class="fas fa-save"></i>
+                </button>
+                <a href="{{ cancel }}" data-bs-toggle="tooltip" title="" class="btn btn-light" data-bs-original-title="{{ button_cancel }}" aria-label="{{ button_cancel }}">
+                    <i class="fas fa-reply"></i>
+                </a>
+            </div>
+
+            <h1>{{ heading_title }}</h1>
+
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-pencil-alt"></i> {{ text_edit }}</div>
+
+            <div class="card-body">
+                <form id="form-module" action="{{ action }}" method="post" data-oc-toggle="ajax">
+                    {% if error_warning %}
+                        <div class="alert alert-danger alert-dismissible">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error_warning }}</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a href="#tab-general" data-bs-toggle="tab" class="nav-link active">{{ tab_general }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#tab-products" data-bs-toggle="tab" class="nav-link">{{ tab_products }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#tab-prices" data-bs-toggle="tab" class="nav-link">{{ tab_prices }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#tab-settings" data-bs-toggle="tab" class="nav-link">{{ tab_settings }}</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab-general">
+                            <div class="row mb-3 required">
+                                <label class="col-sm-2 col-form-label" for="input-name">{{ entry_name }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+
+                                    {% if error_name %}
+                                        <div class="text-danger">{{ error_name }}</div>
+                                    {% endif %}
+                                    <div id="error-name" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-id">{{ entry_id }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="attr_ID" value="{{ attr_ID }}" placeholder="{{ entry_id }}" id="input-id" class="form-control" />
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <ul class="nav nav-tabs" id="language-general">
+                                {% for language in languages %}
+                                    <li class="nav-item">
+                                        <a href="#language-general-{{ language.language_id }}" data-bs-toggle="tab" class="nav-link{% if loop.first %} active{% endif %}">
+                                            <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="tab-content">
+                                {% for language in languages %}
+                                    <div class="tab-pane{% if loop.first %} active{% endif %}" id="language-general-{{ language.language_id }}">
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label" for="input-title{{ language.language_id }}">{{ entry_title }}</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="module_description[{{ language.language_id }}][title]" placeholder="{{ entry_title }}" id="input-title{{ language.language_id }}" value="{{ module_description[language.language_id] ? module_description[language.language_id]['title'] : '' }}" class="form-control" />
+
+                                                <div class="form-text">{{ help_support_html }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label" for="input-description{{ language.language_id }}">{{ entry_description }}</label>
+                                            <div class="col-sm-10">
+                                                <textarea name="module_description[{{ language.language_id }}][description]" placeholder="{{ entry_description }}" id="input-description{{ language.language_id }}" data-oc-toggle="ckeditor" class="form-control">{{ module_description[language.language_id] ? module_description[language.language_id]['description'] : '' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-products">
+                            <ul class="nav nav-tabs" id="language-products">
+                                {% for language in languages %}
+                                    <li class="nav-item">
+                                        <a href="#language-products-{{ language.language_id }}" data-bs-toggle="tab" class="nav-link{% if loop.first %} active{% endif %}">
+                                            <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="tab-content">
+                                {% set prices_row = 0 %}
+
+                                {% for language in languages %}
+                                    <div class="tab-pane{% if loop.first %} active{% endif %}" id="language-products-{{ language.language_id }}">
+                                        <div class="row mb-3 required">
+                                            <label class="col-sm-2 col-form-label" for="input-module-description-{{ language.language_id }}-currency-code">
+                                                <span title="{{ help_currency_cod }}">{{ entry_currency_cod }}</span>
+                                            </label>
+                                            <div class="col-sm-10">
+                                                <select name="module_description[{{ language.language_id }}][currency_code]" id="input-module-description-{{ language.language_id }}-currency-code" class="form-select">
+                                                    <option value="">{{ text_select }}</option>
+
+                                                    {% for currency in currencies %}
+                                                        {% if currency.code == module_description[language.language_id]['currency_code'] %}
+                                                            <option value="{{ currency.code }}" style="{% if currency.status %}color: #097e09;{% else %}color: #bb0909;{% endif %}" selected="selected">{{ currency.code }} - {{ currency.title }} [{{ currency.status_text }}]</option>
+                                                        {% else %}
+                                                            <option value="{{ currency.code }}" style="{% if currency.status %}color: #097e09;{% else %}color: #bb0909;{% endif %}">{{ currency.code }} - {{ currency.title }} [{{ currency.status_text }}]</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+
+                                                <div class="form-text">{{ help_currency_cod }}</div>
+
+                                                {% if error_module_description[language.language_id]['currency_code'] %}
+                                                    <div class="text-danger">{{ error_module_description[language.language_id]['currency_code'] }}</div>
+                                                {% endif %}
+                                                <div id="error-module-description-{{ language.language_id }}-currency-code" class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3 required">
+                                            <label class="col-sm-2 col-form-label" for="input-module-description-{{ language.language_id }}-currency">{{ entry_currency }}</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="module_description[{{ language.language_id }}][currency]" placeholder="{{ entry_currency }}" id="input-module-description-{{ language.language_id }}-currency" value="{{ module_description[language.language_id] ? module_description[language.language_id]['currency'] : '' }}" class="form-control" />
+
+                                                <div class="form-text">{{ help_support_html }}</div>
+
+                                                {% if error_module_description[language.language_id]['currency'] %}
+                                                    <div class="text-danger">{{ error_module_description[language.language_id]['currency'] }}</div>
+                                                {% endif %}
+                                                <div id="error-module-description-{{ language.language_id }}-currency" class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label" for="input-currency_side{{ language.language_id }}">{{ entry_curr_side }}</label>
+                                            <div class="col-sm-10">
+                                                <select name="module_description[{{ language.language_id }}][currency_side]" id="input-currency_side{{ language.language_id }}" class="form-select">
+                                                    {% if module_description[language.language_id]['currency_side'] == 'left' %}
+                                                        <option value="left" selected="selected">{{ text_left_side }}</option>
+                                                        <option value="right">{{ text_right_side }}</option>
+                                                    {% else %}
+                                                        <option value="left">{{ text_left_side }}</option>
+                                                        <option value="right" selected="selected">{{ text_right_side }}</option>
+                                                    {% endif %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label">{{ entry_prices }}</label>
+                                            <div class="col-sm-10"></div>
+                                        </div>
+
+                                        <div class="tab-pane-wrap" style="overflow: auto;">
+                                            <table id="prices-{{ language.language_id }}" class="table table-striped table-bordered table-hover" style="min-width: 1000px;">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="required" style="width: 220px;">{{ column_title }}</td>
+                                                        <td class="required" style="width: 150px;">{{ column_price }}</td>
+                                                        <td style="width: 300px;">{{ column_description }}</td>
+                                                        <td>{{ column_more }}</td>
+                                                        <td class="text-center" style="width: 200px;">{{ column_image }}</td>
+                                                        <td style="width: 200px;">
+                                                            <span data-container="#prices-{{ language.language_id }}" data-toggle="tooltip" data-bs-toggle="tooltip" data-bs-original-title="{{ help_sort_order }}" aria-label="{{ help_sort_order }}" title="{{ help_sort_order }}">{{ column_sort_order }}</span>
+                                                        </td>
+                                                        <td style="width: 70px;"></td>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    {% if prices[language.language_id] %}
+                                                        {% for price in prices[language.language_id] %}
+                                                            <tr id="prices-{{ language.language_id }}-row_{{ prices_row }}">
+                                                                <td>
+                                                                    <input type="text" name="prices[{{ language.language_id }}][{{ prices_row }}][title]" id="input-prices-{{ language.language_id }}-{{ price.price_name }}-title" value="{{ price.title }}" placeholder="{{ column_title }}" class="form-control" />
+
+                                                                    {% if error_prices[language.language_id][price.price_name]['title'] %}
+                                                                        <div class="text-danger">{{ error_prices[language.language_id][price.price_name]['title'] }}</div>
+                                                                    {% endif %}
+                                                                    <div id="error-prices-{{ language.language_id }}-{{ price.price_name }}-title" class="invalid-feedback"></div>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="number" min="0" step="0.01" name="prices[{{ language.language_id }}][{{ prices_row }}][price]" id="input-prices-{{ language.language_id }}-{{ price.price_name }}-price" value="{{ price.price }}" placeholder="{{ column_price }}" class="form-control" />
+
+                                                                    {% if error_prices[language.language_id][price.price_name]['price'] %}
+                                                                        <div class="text-danger">{{ error_prices[language.language_id][price.price_name]['price'] }}</div>
+                                                                    {% endif %}
+                                                                    <div id="error-prices-{{ language.language_id }}-{{ price.price_name }}-price" class="invalid-feedback"></div>
+                                                                </td>
+
+                                                                <td>
+                                                                    <textarea name="prices[{{ language.language_id }}][{{ prices_row }}][description]" rows="8" placeholder="{{ column_description }}" id="input-description{{ prices_row }}" class="form-control">{{ price.description ? price.description : '' }}</textarea>
+                                                                </td>
+
+                                                                <td>
+                                                                    <textarea name="prices[{{ language.language_id }}][{{ prices_row }}][more]" rows="8" placeholder="{{ column_more }}" id="input-more{{ prices_row }}" data-oc-toggle="ckeditor" class="form-control">{{ price.more ? price.more : '' }}</textarea>
+                                                                </td>
+
+                                                                <td class="text-center">
+                                                                    <div class="card">
+                                                                        <img src="{{ price.thumb }}" alt="" title="" id="input-prices-{{ language.language_id }}-{{ prices_row }}-thumb" data-oc-placeholder="{{ placeholder }}" class="card-img-top"/>
+
+                                                                        <input type="hidden" name="prices[{{ language.language_id }}][{{ prices_row }}][image]" value="{{ price.image }}" id="input-prices-{{ language.language_id }}-{{ prices_row }}-image"/>
+
+                                                                        <div class="card-body">
+                                                                            <button type="button" data-oc-toggle="image" data-oc-target="#input-prices-{{ language.language_id }}-{{ prices_row }}-image" data-oc-thumb="#input-prices-{{ language.language_id }}-{{ prices_row }}-thumb" class="btn btn-primary btn-sm btn-block"><i class="fas fa-pencil-alt"></i> {{ button_edit }}</button>
+                                                                            <button type="button" data-oc-toggle="clear" data-oc-target="#input-prices-{{ language.language_id }}-{{ prices_row }}-image" data-oc-thumb="#input-prices-{{ language.language_id }}-{{ prices_row }}-thumb" class="btn btn-warning btn-sm btn-block"><i class="fas fa-trash-alt"></i> {{ button_clear }}</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="number" name="prices[{{ language.language_id }}][{{ prices_row }}][sort_order]" value="{{ price.sort_order }}" min="0" step="1" placeholder="{{ column_sort_order }}" class="form-control" />
+                                                                </td>
+
+                                                                <td class="text-center">
+                                                                    <input type="hidden" name="prices[{{ language.language_id }}][{{ prices_row }}][price_name]" value="{{ price.price_name }}" />
+                                                                    <button type="button" onclick="$('#prices-{{ language.language_id }}-row_{{ prices_row }}, .tooltip').remove();"  data-bs-toggle="tooltip" data-bs-original-title="{{ button_remove }}" aria-label="{{ button_remove }}" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
+                                                                </td>
+                                                            </tr>
+
+                                                            {% set prices_row = prices_row + 1 %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </tbody>
+
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="6"></td>
+                                                        <td class="text-center">
+                                                            <button type="button" onclick="addSlide('{{ language.language_id }}');" data-bs-toggle="tooltip" data-bs-original-title="{{ button_price_add }}" aria-label="{{ button_price_add }}" title="{{ button_price_add }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-prices">
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-view_prices">{{ entry_view_prices }}</label>
+                                <div class="col-sm-10">
+                                    <select name="view_prices" id="input-view_prices" class="form-select">
+                                        {% if view_prices %}
+                                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                                            <option value="0">{{ text_disabled }}</option>
+                                        {% else %}
+                                            <option value="1">{{ text_enabled }}</option>
+                                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-currency_convertion">{{ entry_currency_con }}</label>
+                                <div class="col-sm-10">
+                                    <select name="currency_convertion" id="input-currency_convertion" class="form-select">
+                                        {% if currency_convertion %}
+                                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                                            <option value="0">{{ text_disabled }}</option>
+                                        {% else %}
+                                            <option value="1">{{ text_enabled }}</option>
+                                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                                        {% endif %}
+                                    </select>
+                                    <div class="form-text">{{ help_currency_con }}</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-currency_mode">{{ entry_currency_mod }}</label>
+                                <div class="col-sm-10">
+                                    <select name="currency_mode" id="input-currency_mode" class="form-select">
+                                        <optgroup label="{{ text_curr_mod_l1 }}">
+                                            <option value="11" {% if currency_mode == '11' %}selected="selected"{% endif %}>{{ text_curr_mod_11 }}</option>
+                                        </optgroup>
+                                        <optgroup label="{{ text_curr_mod_l2 }}">
+                                            <option value="21" {% if currency_mode == '21' %}selected="selected"{% endif %}>{{ text_curr_mod_21 }}</option>
+                                            <option value="22" {% if currency_mode == '22' %}selected="selected"{% endif %}>{{ text_curr_mod_22 }}</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="form-text">{{ help_currency_mod }}</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-currency_convertion_language">{{ entry_currency_cl }}</label>
+                                <div class="col-sm-10">
+                                    <select name="currency_convertion_language" id="input-currency_convertion_language" class="form-select">
+                                        {% for language in languages %}
+                                            {% if language.language_id == currency_convertion_language %}
+                                                <option value="{{ language.language_id }}" selected="selected">{{ language.name }}</option>
+                                            {% else %}
+                                                <option value="{{ language.language_id }}">{{ language.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">{{ help_currency_cl }}</div>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <ul class="nav nav-tabs" id="language-prices">
+                                {% for language in languages %}
+                                    <li class="nav-item">
+                                        <a href="#language-prices-{{ language.language_id }}" data-bs-toggle="tab" class="nav-link{% if loop.first %} active{% endif %}">
+                                            <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="tab-content">
+                                {% for language in languages %}
+                                    <div class="tab-pane{% if loop.first %} active{% endif %}" id="language-prices-{{ language.language_id }}">
+                                        <div class="row mb-3">
+                                            <label class="col-sm-12" style="padding: 6px 12px;" for="input-currency_round{{ language.language_id }}">
+                                                <div style="background-color: #e9f4fa; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.125); padding: 6px 20px;">
+                                                    <div style="color: #1b83ba; font-size: 15px;" title="{{ help_currency_rnd }}">{{ entry_currency_rnd }}</div>
+                                                    <div class="form-text">{{ help_currency_rnd }}</div>
+                                                </div>
+                                            </label>
+                                            <div class="col-sm-12 col-form-label">
+                                                {% for currency in currencies %}
+                                                    <div class="row" style="margin-bottom: 15px;">
+                                                        <div class="col-sm-2 col-form-label">{{ currency.title }}</div>
+                                                        <div class="col-sm-5">
+                                                            <select name="module_description[{{ language.language_id }}][currency_round][{{ currency.code }}]" id="input-currency_round" class="form-select">
+                                                                <option value="" {% if module_description[language.language_id]['currency_round'][currency.code] == '' %}selected="selected"{% endif %}>{{ text_curr_rnd_no }}</option>
+                                                                <option value="0" {% if module_description[language.language_id]['currency_round'][currency.code] == '0' %}selected="selected"{% endif %}>0</option>
+                                                                <option value="1" {% if module_description[language.language_id]['currency_round'][currency.code] == '1' %}selected="selected"{% endif %}>10</option>
+                                                                <option value="2" {% if module_description[language.language_id]['currency_round'][currency.code] == '2' %}selected="selected"{% endif %}>100</option>
+                                                                <option value="3" {% if module_description[language.language_id]['currency_round'][currency.code] == '3' %}selected="selected"{% endif %}>1000</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-5">
+                                                            <select name="module_description[{{ language.language_id }}][currency_direction][{{ currency.code }}]" id="input-currency_direction" class="form-select">
+                                                                <option value="0" {% if module_description[language.language_id]['currency_direction'][currency.code] == '0' %}selected="selected"{% endif %}>{{ text_curr_rnd_dft }}</option>
+                                                                <option value="1" {% if module_description[language.language_id]['currency_direction'][currency.code] == '1' %}selected="selected"{% endif %}>{{ text_curr_rnd_min }}</option>
+                                                                <option value="2" {% if module_description[language.language_id]['currency_direction'][currency.code] == '2' %}selected="selected"{% endif %}>{{ text_curr_rnd_max }}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-settings">
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-status">{{ entry_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="status" id="input-status" class="form-select">
+                                        {% if status %}
+                                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                                            <option value="0">{{ text_disabled }}</option>
+                                        {% else %}
+                                            <option value="1">{{ text_enabled }}</option>
+                                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-image_width">{{ entry_images }}</label>
+                                <div class="col-sm-10">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <input type="number" name="image[width]" value="{{ image['width'] }}" placeholder="{{ image_width_default }}" step="1" min="0" id="input-image_width" class="form-control" />
+                                        </div>
+
+                                        <div class="col-sm-2">
+                                            <input type="number" name="image[height]" value="{{ image['height'] }}" placeholder="{{ image_height_default }}" step="1" min="0" id="input-image_height" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-captcha">{{ entry_captcha }}</label>
+                                <div class="col-sm-10">
+                                    <select name="captcha" id="input-captcha" class="form-select">
+                                        <option value="">{{ text_select }}</option>
+
+                                        {% for captcha_option in captchas %}
+                                            {% if captcha_option.value == captcha %}
+                                                <option value="{{ captcha_option.value }}" selected="selected">{{ captcha_option.text }}</option>
+                                            {% else %}
+                                                <option value="{{ captcha_option.value }}">{{ captcha_option.text }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript"><!--
+        var prices_row = {{ prices_row }};
+
+        function addSlide(language_id) {
+            var price_name = uniqid();
+            var html  = '<tr id="prices-' + language_id + '-row_' + prices_row + '">';
+                    html += '<td><input type="text" name="prices[' + language_id + '][' + prices_row + '][title]" id="input-prices-' + language_id + '-' + price_name + '' + prices_row + '-title" value="" placeholder="{{ column_title }}" class="form-control" /><div id="error-prices-' + language_id + '-' + price_name + '' + prices_row + '-title" class="invalid-feedback"></div></td>';
+                    html += '<td><input type="number" min="0" step="0.01" name="prices[' + language_id + '][' + prices_row + '][price]" id="input-prices-' + language_id + '-' + price_name + '' + prices_row + '-price" value="" placeholder="{{ column_price }}" class="form-control" /><div id="error-prices-' + language_id + '-' + price_name + '' + prices_row + '-price" class="invalid-feedback"></div></td>';
+                    html += '<td><textarea name="prices[' + language_id + '][' + prices_row + '][description]" rows="8" placeholder="{{ column_description }}" id="input-description' + prices_row + '" class="form-control"></textarea></td>';
+                    html += '<td><textarea name="prices[' + language_id + '][' + prices_row + '][more]" rows="8" placeholder="{{ column_more }}" id="input-more' + prices_row + '" data-oc-toggle="ckeditor" class="form-control"></textarea></td>';
+                    html += '<td class="text-center"><div class="card"><img src="{{ placeholder }}" alt="" title="" id="input-prices-' + language_id + '-' + prices_row + '-thumb" data-oc-placeholder="{{ placeholder }}" class="card-img-top"/><input type="hidden" name="prices[' + language_id + '][' + prices_row + '][image]" value="" id="input-prices-' + language_id + '-' + prices_row + '-image"/><div class="card-body"><button type="button" data-oc-toggle="image" data-oc-target="#input-prices-' + language_id + '-' + prices_row + '-image" data-oc-thumb="#input-prices-' + language_id + '-' + prices_row + '-thumb" class="btn btn-primary btn-sm btn-block"><i class="fas fa-pencil-alt"></i> {{ button_edit }}</button> <button type="button" data-oc-toggle="clear" data-oc-target="#input-prices-' + language_id + '-' + prices_row + '-image" data-oc-thumb="#input-prices-' + language_id + '-' + prices_row + '-thumb" class="btn btn-warning btn-sm btn-block"><i class="fas fa-trash-alt"></i> {{ button_clear }}</button></div></div></td>';
+                    html += '<td><input type="text" name="prices[' + language_id + '][' + prices_row + '][sort_order]" value="" placeholder="{{ column_sort_order }}" class="form-control" /></td>';
+                    html += '<td class="text-center"><input type="hidden" name="prices[' + language_id + '][' + prices_row + '][price_name]" value="' + price_name + '' + prices_row + '" /><button type="button" onclick="$(\'#prices-' + language_id + '-row_' + prices_row  + ', .tooltip\').remove();" data-bs-toggle="tooltip" data-bs-original-title="{{ button_remove }}" aria-label="{{ button_remove }}" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+                html += '</tr>';
+
+            $('#prices-' + language_id + ' tbody').append(html);
+
+            $('textarea[data-oc-toggle=\'ckeditor\']').ckeditor();
+
+            prices_row++;
+        }
+
+        function uniqid(prefix = '', random = false) {
+            const sec = Date.now() * 1000 + Math.random() * 1000;
+            const id = sec.toString(16).replace(/\./g, '').padEnd(14, '0');
+            return `${prefix}${id}${random ? `.${Math.trunc(Math.random() * 100000000)}`:''}`;
+        };
+    //--></script>
+
+    <script type="text/javascript"><!--
+        $('textarea[data-oc-toggle=\'ckeditor\']').ckeditor();
+    //--></script>
+</div>
+
+{{ footer }}
