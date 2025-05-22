@@ -11,7 +11,11 @@ namespace Opencart\Admin\Controller\Extension\DPrices\Module;
 class DPrices extends \Opencart\System\Engine\Controller {
     private $error = array();
 
+    private $x = '|';
+
     public function index(): void {
+        $this->x = version_compare(VERSION, '4.0.2.0', '>=') ? '.' : '|';
+
         $this->load->language('extension/dprices/module/dprices');
 
         $this->document->setTitle($this->language->get('heading_title'));
@@ -21,8 +25,6 @@ class DPrices extends \Opencart\System\Engine\Controller {
 
         $this->load->model('setting/module');
         $this->load->model('setting/extension');
-
-        $x = (version_compare(VERSION, '4.0.2.0', '>=')) ? '.' : '|';
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
             if (!isset($this->request->get['module_id'])) {
@@ -60,6 +62,12 @@ class DPrices extends \Opencart\System\Engine\Controller {
             $data['error_module_description'] = array();
         }
 
+        $url = '';
+
+        if (isset($this->request->get['module_id'])) {
+            $url .= '&module_id=' . $this->request->get['module_id'];
+        }
+
         $data['breadcrumbs'] = array();
 
         $data['breadcrumbs'][] = array(
@@ -72,27 +80,15 @@ class DPrices extends \Opencart\System\Engine\Controller {
             'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module')
         );
 
-        if (!isset($this->request->get['module_id'])) {
-            $data['breadcrumbs'][] = array(
-                'text' => $this->language->get('heading_title'),
-                'href' => $this->url->link('extension/dprices/module/dprices', 'user_token=' . $this->session->data['user_token'])
-            );
-        } else {
-            $data['breadcrumbs'][] = array(
-                'text' => $this->language->get('heading_title'),
-                'href' => $this->url->link('extension/dprices/module/dprices', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'])
-            );
-        }
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('heading_title'),
+            'href' => $this->url->link('extension/dprices/module/dprices', 'user_token=' . $this->session->data['user_token'] . $url)
+        );
 
-        if (!isset($this->request->get['module_id'])) {
-            $data['action'] = $this->url->link('extension/dprices/module/dprices' . $x . 'save', 'user_token=' . $this->session->data['user_token'], true);
-        } else {
-            $data['action'] = $this->url->link('extension/dprices/module/dprices' . $x . 'save', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
-        }
+        $data['action'] = $this->url->link('extension/dprices/module/dprices' . $this->x . 'save', 'user_token=' . $this->session->data['user_token'] . $url);
+        $data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module');
 
-        $data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
-
-        if (isset($this->request->get['module_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
+        if (isset($this->request->get['module_id'])) {
             $module_info = $this->model_setting_module->getModule($this->request->get['module_id']);
         }
 
@@ -112,9 +108,10 @@ class DPrices extends \Opencart\System\Engine\Controller {
             $data['attr_ID'] = '';
         }
 
-        $data['image'] = array();
-
         $data['image_width_default'] = 320;
+        $data['image_height_default'] = 320;
+
+        $data['image'] = array();
 
         if (isset($this->request->post['image']['width'])) {
             $data['image']['width'] = $this->request->post['image']['width'];
@@ -123,8 +120,6 @@ class DPrices extends \Opencart\System\Engine\Controller {
         } else {
             $data['image']['width'] = $data['image_width_default'];
         }
-
-        $data['image_height_default'] = 320;
 
         if (isset($this->request->post['image']['height'])) {
             $data['image']['height'] = $this->request->post['image']['height'];
@@ -208,13 +203,13 @@ class DPrices extends \Opencart\System\Engine\Controller {
 
         foreach ($results as $result) {
             $data['currencies'][$result['code']] = array(
-                'title'           => $result['title'],
-                'code'            => $result['code'],
-                'symbol_left'     => $result['symbol_left'],
-                'symbol_right'    => $result['symbol_right'],
-                'value'           => $result['value'],
-                'status'          => $result['status'],
-                'status_text'     => $result['status'] ? $this->language->get('text_cur_enabled') : $this->language->get('text_cur_disabled')
+                'title'        => $result['title'],
+                'code'         => $result['code'],
+                'symbol_left'  => $result['symbol_left'],
+                'symbol_right' => $result['symbol_right'],
+                'value'        => $result['value'],
+                'status'       => $result['status'],
+                'status_text'  => $result['status'] ? $this->language->get('text_cur_enabled') : $this->language->get('text_cur_disabled')
             );
         }
 
@@ -329,8 +324,12 @@ class DPrices extends \Opencart\System\Engine\Controller {
 
             if (!isset($this->request->get['module_id'])) {
                 $this->model_setting_module->addModule('dprices.dprices', $this->request->post);
+
+                //$json['redirect'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module');
             } else {
                 $this->model_setting_module->editModule($this->request->get['module_id'], $this->request->post);
+
+                //$json['redirect'] = $this->url->link('extension/dprices/module/dprices', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id']);
             }
 
 			$json['success'] = $this->language->get('text_success');
@@ -347,7 +346,7 @@ class DPrices extends \Opencart\System\Engine\Controller {
     /**
      * Validate Module Data.
      * 
-     * @return bool $this->error
+     * @return bool
      */
     protected function validate(): bool {
         if (!$this->user->hasPermission('modify', 'extension/dprices/module/dprices')) {
@@ -419,17 +418,19 @@ class DPrices extends \Opencart\System\Engine\Controller {
     /**
     * Generate random string.
     *
-    * @return string $random_string
+    * @param int $length
+    *
+    * @return string $string
     */
-    function generateRandomString($length = 16) {
+    private function generateRandomString(int $length = 16): string {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $characters_length = strlen($characters);
-        $random_string = '';
+        $string = '';
 
         for ($i = 0; $i < $length; $i++) {
-            $random_string .= $characters[random_int(0, $characters_length - 1)];
+            $string .= $characters[random_int(0, $characters_length - 1)];
         }
 
-        return $random_string;
+        return $string;
     }
 }

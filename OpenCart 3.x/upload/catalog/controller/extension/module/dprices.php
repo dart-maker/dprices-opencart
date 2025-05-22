@@ -11,35 +11,38 @@ class ControllerExtensionModuleDPrices extends Controller {
     private $error = array();
 
     public function index($setting) {
-        if (isset($setting['prices'][$this->config->get('config_language_id')])) {
+        $view = '';
+        $language_id = $this->config->get('config_language_id');
+
+        if (isset($setting['prices'][$language_id])) {
             $this->load->language('extension/module/dprices');
             $this->load->model('tool/image');
             $this->load->model('localisation/currency');
 
             if ($this->request->server['HTTPS']) {
-                $http_server = HTTPS_SERVER;
+                $HTTP_SERVER = HTTPS_SERVER;
             } else {
-                $http_server = HTTP_SERVER;
+                $HTTP_SERVER = HTTP_SERVER;
             }
 
-            $this->document->addStyle($http_server . 'catalog/view/javascript/module-dprices/dprices.css');
+            $this->document->addStyle($HTTP_SERVER . 'catalog/view/javascript/module-dprices/dprices.css');
 
             static $module = 0;
 
-            $data['heading_title'] = html_entity_decode($setting['module_description'][$this->config->get('config_language_id')]['title'], ENT_QUOTES, 'UTF-8');
-            $data['description'] = html_entity_decode($setting['module_description'][$this->config->get('config_language_id')]['description'], ENT_QUOTES, 'UTF-8');
+            $data['heading_title'] = html_entity_decode($setting['module_description'][$language_id]['title'], ENT_QUOTES, 'UTF-8');
+            $data['description'] = html_entity_decode($setting['module_description'][$language_id]['description'], ENT_QUOTES, 'UTF-8');
             $data['attr_ID'] = $setting['attr_ID'];
             $data['view_prices'] = $setting['view_prices'];
-            $data['currency'] = html_entity_decode($setting['module_description'][$this->config->get('config_language_id')]['currency'], ENT_QUOTES, 'UTF-8');
-            $data['currency_side'] = $setting['module_description'][$this->config->get('config_language_id')]['currency_side'];
-            $data['prices'] = $setting['prices'][$this->config->get('config_language_id')];
+            $data['currency'] = html_entity_decode($setting['module_description'][$language_id]['currency'], ENT_QUOTES, 'UTF-8');
+            $data['currency_side'] = $setting['module_description'][$language_id]['currency_side'];
+            $data['prices'] = $setting['prices'][$language_id];
 
             $data['image_main_width'] = $setting['image']['width'] ? (int)$setting['image']['width'] : 320;
             $data['image_main_height'] = $setting['image']['height'] ? (int)$setting['image']['height'] : 320;
 
-            $currency_code = $setting['module_description'][$this->config->get('config_language_id')]['currency_code'];
-            $currency_round = $setting['module_description'][$this->config->get('config_language_id')]['currency_round'][$this->session->data['currency']];
-            $currency_direction = $setting['module_description'][$this->config->get('config_language_id')]['currency_direction'][$this->session->data['currency']];
+            $currency_code = $setting['module_description'][$language_id]['currency_code'];
+            $currency_round = $setting['module_description'][$language_id]['currency_round'][$this->session->data['currency']];
+            $currency_direction = $setting['module_description'][$language_id]['currency_direction'][$this->session->data['currency']];
             $currency_convertion_language = $setting['currency_convertion_language'];
 
             usort($data['prices'], function($a, $b){
@@ -53,11 +56,11 @@ class ControllerExtensionModuleDPrices extends Controller {
 
                 foreach ($results as $result) {
                     $currencies[$result['code']] = array(
-                        'code'            => $result['code'],
-                        'symbol_left'     => $result['symbol_left'],
-                        'symbol_right'    => $result['symbol_right'],
-                        'value'           => $result['value'],
-                        'status'          => $result['status']
+                        'code'         => $result['code'],
+                        'symbol_left'  => $result['symbol_left'],
+                        'symbol_right' => $result['symbol_right'],
+                        'value'        => $result['value'],
+                        'status'       => $result['status']
                     );
                 }
 
@@ -74,7 +77,7 @@ class ControllerExtensionModuleDPrices extends Controller {
                                 }
                             }
 
-                            $currency_convertion_language = $this->config->get('config_language_id');
+                            $currency_convertion_language = $language_id;
                             break;
                         case '21':
                             $currency_code_mode = $setting['module_description'][$currency_convertion_language]['currency_code'];
@@ -239,14 +242,15 @@ class ControllerExtensionModuleDPrices extends Controller {
 
             $data['module'] = $module++;
 
-            return $this->load->view('extension/module/dprices', $data);
-        } else {
-            return '';
+            $view = $this->load->view('extension/module/dprices', $data);
         }
+
+        return $view;
     }
 
     /**
-     * Submit Form. AJAX.
+     * Submit Form.
+     * AJAX.
      * 
      * @return void
      */
@@ -370,7 +374,7 @@ class ControllerExtensionModuleDPrices extends Controller {
     /**
      * Validate Form Data.
      * 
-     * @return bool $this->error
+     * @return bool
      */
     protected function validate() {
         $this->load->model('extension/module/dprices');

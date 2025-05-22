@@ -54,6 +54,12 @@ class ControllerExtensionModuleDPrices extends Controller {
             $data['error_module_description'] = array();
         }
 
+        $url = '';
+
+        if (isset($this->request->get['module_id'])) {
+            $url .= '&module_id=' . $this->request->get['module_id'];
+        }
+
         $data['breadcrumbs'] = array();
 
         $data['breadcrumbs'][] = array(
@@ -66,24 +72,12 @@ class ControllerExtensionModuleDPrices extends Controller {
             'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
         );
 
-        if (!isset($this->request->get['module_id'])) {
-            $data['breadcrumbs'][] = array(
-                'text' => $this->language->get('heading_title'),
-                'href' => $this->url->link('extension/module/dprices', 'user_token=' . $this->session->data['user_token'], true)
-            );
-        } else {
-            $data['breadcrumbs'][] = array(
-                'text' => $this->language->get('heading_title'),
-                'href' => $this->url->link('extension/module/dprices', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
-            );
-        }
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('heading_title'),
+            'href' => $this->url->link('extension/module/dprices', 'user_token=' . $this->session->data['user_token'] . $url, true)
+        );
 
-        if (!isset($this->request->get['module_id'])) {
-            $data['action'] = $this->url->link('extension/module/dprices', 'user_token=' . $this->session->data['user_token'], true);
-        } else {
-            $data['action'] = $this->url->link('extension/module/dprices', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
-        }
-
+        $data['action'] = $this->url->link('extension/module/dprices', 'user_token=' . $this->session->data['user_token'] . $url, true);
         $data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
 
         if (isset($this->request->get['module_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
@@ -106,9 +100,10 @@ class ControllerExtensionModuleDPrices extends Controller {
             $data['attr_ID'] = '';
         }
 
-        $data['image'] = array();
-
         $data['image_width_default'] = 320;
+        $data['image_height_default'] = 320;
+
+        $data['image'] = array();
 
         if (isset($this->request->post['image']['width'])) {
             $data['image']['width'] = $this->request->post['image']['width'];
@@ -117,8 +112,6 @@ class ControllerExtensionModuleDPrices extends Controller {
         } else {
             $data['image']['width'] = $data['image_width_default'];
         }
-
-        $data['image_height_default'] = 320;
 
         if (isset($this->request->post['image']['height'])) {
             $data['image']['height'] = $this->request->post['image']['height'];
@@ -202,13 +195,13 @@ class ControllerExtensionModuleDPrices extends Controller {
 
         foreach ($results as $result) {
             $data['currencies'][$result['code']] = array(
-                'title'           => $result['title'],
-                'code'            => $result['code'],
-                'symbol_left'     => $result['symbol_left'],
-                'symbol_right'    => $result['symbol_right'],
-                'value'           => $result['value'],
-                'status'          => $result['status'],
-                'status_text'     => $result['status'] ? $this->language->get('text_cur_enabled') : $this->language->get('text_cur_disabled')
+                'title'        => $result['title'],
+                'code'         => $result['code'],
+                'symbol_left'  => $result['symbol_left'],
+                'symbol_right' => $result['symbol_right'],
+                'value'        => $result['value'],
+                'status'       => $result['status'],
+                'status_text'  => $result['status'] ? $this->language->get('text_cur_enabled') : $this->language->get('text_cur_disabled')
             );
         }
 
@@ -292,7 +285,7 @@ class ControllerExtensionModuleDPrices extends Controller {
     /**
      * Validate Module Data.
      * 
-     * @return bool $this->error
+     * @return bool
      */
     protected function validate() {
         if (!$this->user->hasPermission('modify', 'extension/module/dprices')) {
@@ -341,7 +334,7 @@ class ControllerExtensionModuleDPrices extends Controller {
     *
     * @return void
     */
-    public function install(): void {
+    public function install() {
         $this->load->model('setting/setting');
 
         // Add settings.
@@ -356,7 +349,7 @@ class ControllerExtensionModuleDPrices extends Controller {
     *
     * @return void
     */
-    public function uninstall(): void {
+    public function uninstall() {
         $this->load->model('setting/setting');
         $this->model_setting_setting->deleteSetting('module_dprices');
     }
@@ -366,17 +359,17 @@ class ControllerExtensionModuleDPrices extends Controller {
     *
     * @param int $length
     *
-    * @return string $random_string
+    * @return string $string
     */
-    function generateRandomString($length = 16): string {
+    private function generateRandomString($length = 16) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $characters_length = strlen($characters);
-        $random_string = '';
+        $string = '';
 
         for ($i = 0; $i < $length; $i++) {
-            $random_string .= $characters[random_int(0, $characters_length - 1)];
+            $string .= $characters[random_int(0, $characters_length - 1)];
         }
 
-        return $random_string;
+        return $string;
     }
 }

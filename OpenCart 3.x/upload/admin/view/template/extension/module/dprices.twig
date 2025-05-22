@@ -40,18 +40,10 @@
             <div class="panel-body">
                 <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
                     <ul class="nav nav-tabs">
-                        <li class="active">
-                            <a href="#tab-general" data-toggle="tab">{{ tab_general }}</a>
-                        </li>
-                        <li>
-                            <a href="#tab-products" data-toggle="tab">{{ tab_products }}</a>
-                        </li>
-                        <li>
-                            <a href="#tab-prices" data-toggle="tab">{{ tab_prices }}</a>
-                        </li>
-                        <li>
-                            <a href="#tab-settings" data-toggle="tab">{{ tab_settings }}</a>
-                        </li>
+                        <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+                        <li><a href="#tab-products" data-toggle="tab">{{ tab_products }}</a></li>
+                        <li><a href="#tab-prices" data-toggle="tab">{{ tab_prices }}</a></li>
+                        <li><a href="#tab-settings" data-toggle="tab">{{ tab_settings }}</a></li>
                     </ul>
 
                     <div class="tab-content">
@@ -200,7 +192,7 @@
                                                     {% if prices[language.language_id] %}
                                                         {% for price in prices[language.language_id] %}
                                                             <tr id="prices-row{{ prices_row }}">
-                                                                <td class="text-left">
+                                                                <td class="text-left{% if error_prices[language.language_id][price.price_name]['title'] %} has-error{% endif %}">
                                                                     <input type="text" name="prices[{{ language.language_id }}][{{ prices_row }}][title]" value="{{ price.title }}" placeholder="{{ column_title }}" class="form-control" />
 
                                                                     {% if error_prices[language.language_id][price.price_name]['title'] %}
@@ -208,7 +200,7 @@
                                                                     {% endif %}
                                                                 </td>
 
-                                                                <td class="text-left">
+                                                                <td class="text-left{% if error_prices[language.language_id][price.price_name]['price'] %} has-error{% endif %}">
                                                                     <input type="number" min="0" step="0.01" name="prices[{{ language.language_id }}][{{ prices_row }}][price]" value="{{ price.price }}" placeholder="{{ column_price }}" class="form-control" />
 
                                                                     {% if error_prices[language.language_id][price.price_name]['price'] %}

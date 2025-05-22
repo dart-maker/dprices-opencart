@@ -17,7 +17,7 @@ class ModelExtensionModuleDPrices extends Model {
      * 
      * @return array $query->row
      */
-    public function getExtensionByCode(string $type, string $code): array {
+    public function getExtensionByCode($type, $code) {
         $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "extension` WHERE `type` = '" . $this->db->escape($type) . "' AND `code` = '" . $this->db->escape($code) . "'");
 
         return $query->row;

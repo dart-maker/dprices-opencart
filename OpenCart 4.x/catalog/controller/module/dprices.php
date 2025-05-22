@@ -11,8 +11,15 @@ namespace Opencart\Catalog\Controller\Extension\DPrices\Module;
 class DPrices extends \Opencart\System\Engine\Controller {
     private $error = array();
 
+    private $x = '|';
+
     public function index($setting): string {
-        if (isset($setting['prices'][$this->config->get('config_language_id')])) {
+        $this->x = version_compare(VERSION, '4.0.2.0', '>=') ? '.' : '|';
+
+        $view = '';
+        $language_id = $this->config->get('config_language_id');
+
+        if (isset($setting['prices'][$language_id])) {
             $this->load->language('extension/dprices/module/dprices');
 
             $this->load->model('localisation/currency');
@@ -23,22 +30,20 @@ class DPrices extends \Opencart\System\Engine\Controller {
 
             static $module = 0;
 
-            $x = (version_compare(VERSION, '4.0.2.0', '>=')) ? '.' : '|';
-
-            $data['heading_title'] = html_entity_decode($setting['module_description'][$this->config->get('config_language_id')]['title'], ENT_QUOTES, 'UTF-8');
-            $data['description'] = html_entity_decode($setting['module_description'][$this->config->get('config_language_id')]['description'], ENT_QUOTES, 'UTF-8');
+            $data['heading_title'] = html_entity_decode($setting['module_description'][$language_id]['title'], ENT_QUOTES, 'UTF-8');
+            $data['description'] = html_entity_decode($setting['module_description'][$language_id]['description'], ENT_QUOTES, 'UTF-8');
             $data['attr_ID'] = $setting['attr_ID'];
             $data['view_prices'] = $setting['view_prices'];
-            $data['currency'] = html_entity_decode($setting['module_description'][$this->config->get('config_language_id')]['currency'], ENT_QUOTES, 'UTF-8');
-            $data['currency_side'] = $setting['module_description'][$this->config->get('config_language_id')]['currency_side'];
-            $data['prices'] = $setting['prices'][$this->config->get('config_language_id')];
+            $data['currency'] = html_entity_decode($setting['module_description'][$language_id]['currency'], ENT_QUOTES, 'UTF-8');
+            $data['currency_side'] = $setting['module_description'][$language_id]['currency_side'];
+            $data['prices'] = $setting['prices'][$language_id];
 
             $data['image_main_width'] = $setting['image']['width'] ? (int)$setting['image']['width'] : 320;
             $data['image_main_height'] = $setting['image']['height'] ? (int)$setting['image']['height'] : 320;
 
-            $currency_code = $setting['module_description'][$this->config->get('config_language_id')]['currency_code'];
-            $currency_round = $setting['module_description'][$this->config->get('config_language_id')]['currency_round'][$this->session->data['currency']];
-            $currency_direction = $setting['module_description'][$this->config->get('config_language_id')]['currency_direction'][$this->session->data['currency']];
+            $currency_code = $setting['module_description'][$language_id]['currency_code'];
+            $currency_round = $setting['module_description'][$language_id]['currency_round'][$this->session->data['currency']];
+            $currency_direction = $setting['module_description'][$language_id]['currency_direction'][$this->session->data['currency']];
             $currency_convertion_language = $setting['currency_convertion_language'];
 
             usort($data['prices'], function($a, $b){
@@ -52,11 +57,11 @@ class DPrices extends \Opencart\System\Engine\Controller {
 
                 foreach ($results as $result) {
                     $currencies[$result['code']] = array(
-                        'code'            => $result['code'],
-                        'symbol_left'     => $result['symbol_left'],
-                        'symbol_right'    => $result['symbol_right'],
-                        'value'           => $result['value'],
-                        'status'          => $result['status']
+                        'code'         => $result['code'],
+                        'symbol_left'  => $result['symbol_left'],
+                        'symbol_right' => $result['symbol_right'],
+                        'value'        => $result['value'],
+                        'status'       => $result['status']
                     );
                 }
 
@@ -73,7 +78,7 @@ class DPrices extends \Opencart\System\Engine\Controller {
                                 }
                             }
 
-                            $currency_convertion_language = $this->config->get('config_language_id');
+                            $currency_convertion_language = $language_id;
                             break;
                         case '21':
                             $currency_code_mode = $setting['module_description'][$currency_convertion_language]['currency_code'];
@@ -236,22 +241,25 @@ class DPrices extends \Opencart\System\Engine\Controller {
                 $data['captcha_code'] = openssl_encrypt($setting['captcha'], 'AES-128-ECB', $this->config->get('module_dprices_captcha_ed_pc'));
             }
 
-            $data['action'] = $this->url->link('extension/dprices/module/dprices' . $x . 'submit', '');
+            $data['action'] = $this->url->link('extension/dprices/module/dprices' . $this->x . 'submit', '');
 
             $data['module'] = $module++;
 
-            return $this->load->view('extension/dprices/module/dprices', $data);
-        } else {
-            return '';
+            $view = $this->load->view('extension/dprices/module/dprices', $data);
         }
+
+        return $view;
     }
 
     /**
-     * Submit Form. AJAX.
+     * Submit Form.
+     * AJAX.
      * 
      * @return void
      */
     public function submit(): void {
+        $this->x = version_compare(VERSION, '4.0.2.0', '>=') ? '.' : '|';
+
         $this->load->language('extension/dprices/module/dprices');
 
         $json = array();
@@ -315,7 +323,7 @@ class DPrices extends \Opencart\System\Engine\Controller {
      * 
      * @return void
      */
-    private function sendMail($order, $price, $currency, $language_current): void {
+    private function sendMail(string $order, string $price, string $currency, string $language_current): void {
         $language = new \Opencart\System\Library\Language($this->config->get('config_language_admin'));
         $language->addPath(DIR_EXTENSION . 'dprices/catalog/language/');
         $language->load('module/dprices', '', $this->config->get('config_language_admin'));
@@ -346,7 +354,7 @@ class DPrices extends \Opencart\System\Engine\Controller {
      * 
      * @return string $html
      */
-    private function htmlMail($order, $price, $currency, $language_current): string {
+    private function htmlMail(string $order, string $price, string $currency, string $language_current): string {
         $language = new \Opencart\System\Library\Language($this->config->get('config_language_admin'));
         $language->addPath(DIR_EXTENSION . 'dprices/catalog/language/');
         $language->load('module/dprices', '', $this->config->get('config_language_admin'));
@@ -371,12 +379,10 @@ class DPrices extends \Opencart\System\Engine\Controller {
     /**
      * Validate Form Data.
      * 
-     * @return bool $this->error
+     * @return bool
      */
     protected function validate(): bool {
         $this->load->model('setting/extension');
-
-        $x = (version_compare(VERSION, '4.0.2.0', '>=')) ? '.' : '|';
 
         /* if (empty(trim($this->request->post['email'])) && empty(trim($this->request->post['phone']))) {
             $this->error['form']['fields']['email'] = $this->language->get('error_field');
@@ -410,7 +416,7 @@ class DPrices extends \Opencart\System\Engine\Controller {
 
                 if ($extension_info) {
                     if ($this->config->get('captcha_' . $captcha_code . '_status')) {
-                        $captcha = $this->load->controller('extension/' . $extension_info['extension'] . '/captcha/' . $extension_info['code'] . $x . 'validate');
+                        $captcha = $this->load->controller('extension/' . $extension_info['extension'] . '/captcha/' . $extension_info['code'] . $this->x . 'validate');
 
                         if ($captcha) {
                             $this->error['form']['captcha'] = $captcha;
